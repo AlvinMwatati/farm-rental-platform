@@ -2,36 +2,38 @@
 
 namespace App\Events;
 
+use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel; // ✅ Import PrivateChannel
+use Illuminate\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Queue\SerializesModels;
-use App\Models\User;
 
 class MessageSent implements ShouldBroadcastNow
 {
     use InteractsWithSockets, SerializesModels;
 
-    public $user;
     public $message;
 
-    public function __construct(User $user, $message)
+    public function __construct(Message $message)
     {
-        $this->user = $user->name; // Send the user's name
         $this->message = $message;
     }
 
     public function broadcastOn()
     {
-        // We'll broadcast on a public channel called 'chat.general'
-        return new Channel('chat.general');
+        return new PrivateChannel('chat.' . $this->message->recipient_id); // ✅ Use PrivateChannel
     }
 
     public function broadcastWith()
     {
         return [
-            'user'    => $this->user,
-            'message' => $this->message,
+            'sender_id' => $this->message->sender_id,
+            'recipient_id' => $this->message->recipient_id,
+            'message' => $this->message->message, // Use 'content' if your column is named "content"
+            'created_at' => $this->message->created_at->toDateTimeString(),
         ];
     }
 }

@@ -9,42 +9,48 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
-    public function index()
-{
-    $users = \App\Models\User::where('id', '!=', auth()->id())->get();
-    return view('chat', compact('users'));
-}
+    // Chat Page
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $users = User::where('id', '!=', Auth::id())
+            ->when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->get();
 
-// Get Messages for a Specific User
-public function getMessages($recipientId)
-{
-    $messages = Message::where(function ($query) use ($recipientId) {
-        $query->where('sender_id', auth()->id())
-              ->where('recipient_id', $recipientId);
-    })->orWhere(function ($query) use ($recipientId) {
-        $query->where('sender_id', $recipientId)
-              ->where('recipient_id', auth()->id());
-    })->orderBy('created_at')->get();
+        return view('chat', compact('users'));
+    }
 
-    return response()->json(['messages' => $messages]);
-}
+    // Get Messages for a Specific User
+    public function getMessages($recipientId)
+    {
+        $messages = Message::where(function ($query) use ($recipientId) {
+            $query->where('sender_id', auth()->id())
+                  ->where('recipient_id', $recipientId);
+        })->orWhere(function ($query) use ($recipientId) {
+            $query->where('sender_id', $recipientId)
+                  ->where('recipient_id', auth()->id());
+        })->orderBy('created_at', 'asc')->get(); // ✅ Fixed sorting direction
 
-// Send a Message
-public function sendMessage(Request $request)
-{
-    $request->validate([
-        'recipient_id' => 'required|exists:users,id',
-        'content' => 'required|string',
-    ]);
+        return response()->json(['messages' => $messages]);
+    }
 
-    $message = Message::create([
-        'sender_id' => auth()->id(),
-        'recipient_id' => $request->recipient_id,
-        'content' => $request->content,
-    ]);
+    // Send a Message
+    public function sendMessage(Request $request)
+    {
+        $validated = $request->validate([
+            'recipient_id' => 'required|exists:users,id',
+            'content' => 'required|string|max:1000',
+        ]);
 
-    return response()->json(['message' => 'Message sent!', 'data' => $message]);
-}
+        $message = Message::create([
+            'sender_id' => auth()->id(),
+            'recipient_id' => $validated['recipient_id'],
+            'message' => $validated['message'],
+        ]);
 
-    
+        return response()->json(['message' => 'Message sent!', 'data' => $message]);
+    }
 }

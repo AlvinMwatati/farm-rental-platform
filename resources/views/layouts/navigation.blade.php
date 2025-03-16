@@ -4,53 +4,68 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <img src="{{ asset('images/logo.png') }}" class="h-10" alt="Logo">
+                    <a href="{{ url('/') }}">
+                        <img src="{{ asset('images/logo.png') }}" class="h-10 w-auto" alt="Logo">
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <x-nav-link :href="url('/')" :active="request()->is('/')">
+                        {{ __('Home') }}
                     </x-nav-link>
-
-                    <x-nav-link :href="route('listings.index')" :active="request()->routeIs('listings.index')">
+                    
+                    <x-nav-link :href="route('listings.index')" :active="request()->is('listings*')">
                         {{ __('Listings') }}
                     </x-nav-link>
 
-                    <!-- Chat Link -->
-                    <x-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.index')">
-                        {{ __('Chat') }}
-                    </x-nav-link>
+                    @auth
+                        <x-nav-link :href="route('dashboard')" :active="request()->is('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('chat.index')" :active="request()->is('chat')">
+                            {{ __('Chat') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('forum')" :active="request()->is('forum')">
+                            {{ __('Forum') }}
+                        </x-nav-link>
+                    @endauth
                 </div>
             </div>
 
-            <!-- Right Side -->
+            <!-- Right Side User Auth Links -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700">
-                            {{ Auth::user()->name }}
-                            <svg class="ml-2 h-4 w-4" viewBox="0 0 20 20">
-                                <path d="M5 7l5 5 5-5H5z"></path>
-                            </svg>
-                        </button>
-                    </x-slot>
+                @auth
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900">
+                                {{ Auth::user()->name }}
+                                <svg class="ml-2 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')" 
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                        <x-slot name="content">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Logout') }}
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                @else
+                    <x-nav-link :href="route('login')" :active="request()->is('login')">
+                        {{ __('Login') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('register')" :active="request()->is('register')">
+                        {{ __('Register') }}
+                    </x-nav-link>
+                @endauth
             </div>
         </div>
     </div>

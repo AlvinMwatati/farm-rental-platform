@@ -1,80 +1,96 @@
 document.addEventListener('DOMContentLoaded', function () {
     let selectedUserId = null;
+    let authUserId = document.querySelector('meta[name="auth-user"]').getAttribute('content');
 
-    // Open Chat for Selected User
+    // Make openChat globally accessible
     window.openChat = function (userId, userName) {
         selectedUserId = userId;
-        document.getElementById('chat-user-name').innerText = userName;
-        document.getElementById('messages').innerHTML = ''; // Clear previous chat
+        document.getElementById('chat-header').innerText = `Chat with ${userName}`;
         loadMessages(userId);
     };
 
-    // Load Messages for Selected User
     function loadMessages(userId) {
-        axios.get(`/chat/messages/${userId}`)
+        axios.get(`/messages/${userId}`)
             .then(response => {
                 const messagesDiv = document.getElementById('messages');
-                messagesDiv.innerHTML = ''; // Clear old messages
+                messagesDiv.innerHTML = '';
 
-                response.data.forEach(msg => {
+                response.data.forEach(message => {
                     const messageElement = document.createElement('div');
-                    messageElement.classList.add('mb-2', 'p-2', 'rounded-md', 'max-w-[75%]');
+                    messageElement.classList.add('p-2', 'rounded-lg', 'max-w-xs', 'w-fit');
 
-                    if (msg.sender_id === parseInt('{{ auth()->id() }}')) {
+                    if (message.sender_id === parseInt(authUserId)) {
                         messageElement.classList.add('bg-blue-500', 'text-white', 'ml-auto', 'text-right');
                     } else {
-                        messageElement.classList.add('bg-gray-200', 'text-black', 'mr-auto', 'text-left');
+                        messageElement.classList.add('bg-gray-300', 'text-black', 'mr-auto', 'text-left');
                     }
 
-                    messageElement.innerText = msg.message;
+                    messageElement.innerHTML = `<strong>${message.sender_name}:</strong> ${message.message}`;
                     messagesDiv.appendChild(messageElement);
                 });
 
-                messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to latest message
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
             })
             .catch(error => console.error('Error loading messages:', error));
     }
 
-    // Send Message
     document.getElementById('send-message').addEventListener('click', function () {
         const messageInput = document.getElementById('message-input');
         const message = messageInput.value.trim();
+        if (message === '' || !selectedUserId) return;
 
-        if (message === '' || selectedUserId === null) return;
-
-        axios.post('/send-message', {
-            recipient_id: selectedUserId,
-            message
-        })
+        axios.post('/send-message', { recipient_id: selectedUserId, message: message })
             .then(response => {
                 messageInput.value = '';
-                appendMessage(response.data.message, true);
+                loadMessages(selectedUserId);
             })
             .catch(error => console.error('Error sending message:', error));
     });
 
-    // Append Sent Message
-    function appendMessage(msg, isSentByMe) {
-        const messagesDiv = document.getElementById('messages');
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('mb-2', 'p-2', 'rounded-md', 'max-w-[75%]');
+    document.getElementById('search-user').addEventListener('input', function () {
+        let searchQuery = this.value;
 
-        if (isSentByMe) {
-            messageElement.classList.add('bg-blue-500', 'text-white', 'ml-auto', 'text-right');
-        } else {
-            messageElement.classList.add('bg-gray-200', 'text-black', 'mr-auto', 'text-left');
+        axios.get(`/chat?search=${searchQuery}`)
+            .then(response => {
+                let usersContainer = document.getElementById('users-container');
+                usersContainer.innerHTML = '';
+
+                response.data.forEach(user => {
+                    let userElement = document.createElement('li');
+                    userElement.classList.add('user-item', 'flex', 'items-center', 'space-x-3', 'p-3', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-200');
+
+                    userElement.addEventListener('click', () => openChat(user.id, user.name));
+
+                    userElement.innerHTML = `
+                        <div class="w-10 h-10 bg-gray-300 flex items-center justify-center rounded-full">
+                            ${user.name.charAt(0)}
+                        </div>
+                        <span>${user.name}</span>
+                    `;
+
+                    usersContainer.appendChild(userElement);
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    });
+
+    // Load the first user in the list by default
+    setTimeout(() => {
+        const firstUser = document.querySelector('.user-item');
+        if (firstUser) {
+            firstUser.click();
         }
+    }, 500);
 
-        messageElement.innerText = msg.message;
-        messagesDiv.appendChild(messageElement);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll
+    // Listen for real-time messages using Laravel Echo
+    if (typeof Echo !== 'undefined') {
+        Echo.private(`chat.${authUserId}`)
+            .listen('MessageSent', (event) => {
+                if (selectedUserId === event.message.sender_id || selectedUserId === event.message.recipient_id) {
+                    loadMessages(selectedUserId);
+                }
+            });
+    } else {
+        console.warn("Echo is not defined. WebSockets may not be working.");
     }
-
-    // Real-time Updates with Laravel Echo
-    window.Echo.private(`chat.${parseInt('{{ auth()->id() }}')}`)
-        .listen('MessageSent', (event) => {
-            if (selectedUserId === event.sender_id || selectedUserId === event.recipient_id) {
-                appendMessage(event, event.sender_id === parseInt('{{ auth()->id() }}'));
-            }
-        });
 });

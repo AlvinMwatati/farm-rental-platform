@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Auth User Data for JavaScript -->
+    <meta name="user-id" content="{{ Auth::id() }}">
+    <script>
+        window.Laravel = {!! json_encode([
+            'user' => Auth::user(),
+        ]) !!};
+    </script>
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -11,26 +19,23 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Styles & Scripts -->
+    @vite(['resources/css/app.css'])
+    @livewireStyles  <!-- ✅ Include Livewire styles if using Livewire -->
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 flex flex-col"> <!-- Use flex to allow content to grow -->
+        <!-- Navigation -->
         @include('layouts.navigation')
 
-        <!-- Page Heading -->
-        @if (isset($header))
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
-
         <!-- Page Content -->
-        <main>
-            @yield('content')  <!-- ✅ This replaces {{ $slot }} -->
+        <main class="flex-1"> <!-- Allow main to take up remaining space -->
+            @yield('content')
         </main>
     </div>
+
+    <!-- Scripts -->
+    @vite(['resources/js/app.js'])
+    @livewireScripts  <!-- ✅ Include Livewire scripts if using Livewire -->
 </body>
 </html>

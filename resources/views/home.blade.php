@@ -7,15 +7,10 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h1 class="text-3xl font-bold">Welcome to Farm Rental</h1>
-                    <p class="mt-2 text-gray-600">Easily browse and rent farm equipment.</p>
-                    
-                    <a href="{{ route('listings.index') }}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-md">
-                        View Listings
-                    </a>
-                </div>
+            <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                <h3 class="text-lg font-semibold">Find the Best Farm Equipment for Rent</h3>
+                <p>We connect farm owners with renters looking for high-quality equipment.</p>
+                <a href="{{ route('listings.index') }}" class="text-blue-600 hover:underline">Browse Listings</a>
             </div>
         </div>
     </div>
