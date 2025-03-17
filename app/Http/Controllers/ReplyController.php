@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reply;
+use App\Models\Post;
+use App\Models\User;
+use App\Models\Like;
+use App\Models\SharedPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

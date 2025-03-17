@@ -74,6 +74,8 @@ class Chat extends Component
         } finally {
             $this->isSending = false;
         }
+        $this->message = ''; // Clear input field
+        $this->loadMessages();
     }
 
     protected function validateRecipient($userId)

@@ -41,4 +41,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function likes()
+{
+    return $this->hasMany(Like::class);
+}
+
+public function hasLiked(Post $post)
+{
+    return $this->likes()->where('post_id', $post->id)->exists();
+}
+
+public function isAdmin()
+{
+    return $this->is_admin; // Assumes you have an is_admin column in the users table
+}
+
 }
