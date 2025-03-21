@@ -53,4 +53,11 @@ class ChatController extends Controller
 
         return response()->json(['message' => 'Message sent!', 'data' => $message]);
     }
+
+    public function startChat($userId)
+    {
+        $receiver = User::findOrFail($userId);
+
+        return view('chat', compact('receiver'));
+    }
 }

@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Filament\Models\Contracts\FilamentUser;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -54,7 +55,14 @@ public function hasLiked(Post $post)
 
 public function isAdmin()
 {
-    return $this->is_admin; // Assumes you have an is_admin column in the users table
+    return (bool)$this->is_admin;
+ // This should return 1 (or true) for admins.
 }
+
+ public function canAccessFilament(): bool
+    {
+        return (bool)$this->is_admin;
+ // Change this if you use roles/permissions
+    }
 
 }

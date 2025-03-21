@@ -4,23 +4,23 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\LikeController;
-use App\Http\Controllers\SharedPostController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ListingAdminController;
-use App\Http\Controllers\ChatController;
-use App\Http\Controllers\ChatMessageController;
-use App\Providers\FillamentServiceProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use App\Http\Livewire\Chat;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
 
 // Protected Routes (Authenticated Users Only)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
+    Route::post('/listings', [ListingController::class, 'store'])->name('listings.store');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -29,6 +29,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat', function () {
         return view('chat');
     })->name('chat.index');
+
+   Route::get('/chat/start/{user}', [ChatController::class, 'startChat'])->name('chat.start');
 
     // Forum
     Route::get('/forum', [PostController::class, 'index'])->name('forum');
@@ -54,19 +56,19 @@ Route::middleware(['auth'])->group(function () {
     })->name('users.list');
 });
 
-Route::middleware(['auth', 'can:accessFilament'])->group(function () {
-    Route::get('/admin', function () {
+// ✅ Filament Admin Panel Access
+Route::middleware(['auth', 'can:access-filament'])->group(function () {
+    Route::get('/admin/dashboard', function () {
         return redirect()->route('filament.admin.pages.dashboard');
     })->name('admin.dashboard');
 });
 
-
-// Admin Routes (Only Admins)
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+// ✅ Admin-Specific Routes
+Route::middleware(['auth', 'can:access-filament'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     // // Listings Management
-    // Route::prefix('/admin/listings')->group(function () {
+    // Route::prefix('/listings')->group(function () {
     //     Route::get('/', [ListingAdminController::class, 'index'])->name('admin.listings');
     //     Route::get('/create', [ListingAdminController::class, 'create'])->name('admin.listings.create');
     //     Route::post('/', [ListingAdminController::class, 'store'])->name('admin.listings.store');

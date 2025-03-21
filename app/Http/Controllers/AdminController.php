@@ -9,7 +9,10 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // Redirect to Filament admin dashboard
-        return redirect(Filament::getPanel('admin')->getUrl());
+        if (auth()->user()?->canAccessFilament()) {
+            return redirect('/admin/dashboard'); // Direct to Filament dashboard
+        }
+
+        abort(403, 'Unauthorized'); // Prevents looping
     }
 }
