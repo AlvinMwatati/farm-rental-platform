@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ListingAdminController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -31,6 +32,18 @@ Route::middleware(['auth'])->group(function () {
     })->name('chat.index');
 
    Route::get('/chat/start/{user}', [ChatController::class, 'startChat'])->name('chat.start');
+
+   
+    // Start chat with a specific user (parameter name "user")
+    Route::get('/chat/start/{user}', [ChatController::class, 'startChat2'])->name('chat.start');
+
+    // Authenticated route for user's own listings
+Route::middleware(['auth'])->group(function () {
+    Route::get('/listings/my', [ListingController::class, 'myListings'])->name('listings.my');
+    Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
+    Route::post('/listings', [ListingController::class, 'store'])->name('listings.store');
+});
+
 
     // Forum
     Route::get('/forum', [PostController::class, 'index'])->name('forum');

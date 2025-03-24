@@ -39,4 +39,11 @@ class ListingController extends Controller
 
     return redirect()->route('listings.index')->with('success', 'Listing created successfully!');
 }
+
+public function myListings()
+{
+    $myListings = Listing::where('user_id', auth()->id())->latest()->get();
+    return view('listings.my', compact('myListings'));
+}
+
 }

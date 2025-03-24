@@ -60,4 +60,11 @@ class ChatController extends Controller
 
         return view('chat', compact('receiver'));
     }
+
+    public function startChat2($user)
+    {
+        // $user contains the listing owner's ID.
+        $receiver = User::findOrFail($user);
+        return view('chat', compact('receiver'));
+    }
 }

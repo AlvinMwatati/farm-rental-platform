@@ -14,10 +14,26 @@
                     <x-nav-link :href="url('/')" :active="request()->is('/')">
                         {{ __('Home') }}
                     </x-nav-link>
-                    
-                    <x-nav-link :href="route('listings.index')" :active="request()->is('listings*')">
-                        {{ __('Listings') }}
-                    </x-nav-link>
+
+                    <!-- Listings Dropdown -->
+                    <div class="group relative">
+                        <button class="px-4 py-2 text-gray-800 hover:text-gray-600 focus:outline-none">
+                            Listings
+                        </button>
+                        <div class="absolute left-0 hidden w-48 bg-white shadow-md rounded mt-1 group-hover:block z-50">
+                            <a href="{{ route('listings.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                Available Listings
+                            </a>
+                            @auth
+                                <a href="{{ route('listings.my') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    My Listings
+                                </a>
+                                <a href="{{ route('listings.create') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    Post a Listing
+                                </a>
+                            @endauth
+                        </div>
+                    </div>
 
                     @auth
                         <x-nav-link :href="route('dashboard')" :active="request()->is('dashboard')">
@@ -51,7 +67,8 @@
                         <x-slot name="content">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <x-dropdown-link :href="route('logout')" 
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
                                     {{ __('Logout') }}
                                 </x-dropdown-link>
                             </form>

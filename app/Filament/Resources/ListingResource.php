@@ -68,7 +68,7 @@ class ListingResource extends Resource
                 // Custom "Contact Owner" action:
                 Tables\Actions\Action::make('contact')
     ->label('Contact Owner')
-    ->url(fn (Listing $record) => route('chat.start', ['user' => $record->user_id]))
+    ->url(fn (Listing $record) => route('chat.start', ['receiver' => $record->user_id]))
     ->icon('heroicon-o-mail')
     ->openUrlInNewTab(),
             ])

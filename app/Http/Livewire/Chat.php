@@ -20,20 +20,30 @@ class Chat extends Component
 
     protected $listeners = ['echo-private:chat,MessageSent' => 'loadMessages'];
 
-    public function mount()
-    {
-        $this->users = User::where('id', '!=', Auth::id())->get();
-        $this->messages = collect();
-        $this->sharedPosts = collect(); // Initialize sharedPosts
+    public function mount($recipientId = null)
+{
+    $this->users = User::where('id', '!=', Auth::id())->get();
+    $this->messages = collect();
+    $this->sharedPosts = collect();
+
+    if ($recipientId) {
+        $this->recipient_id = $recipientId;
+        $this->loadMessages();
+        $this->loadSharedPosts();
     }
+}
+
 
     public function selectUser($userId)
-    {
+{
+    if ($this->recipient_id !== $userId) { // Avoid reloading same chat
         $this->validateRecipient($userId);
         $this->recipient_id = $userId;
         $this->loadMessages();
-        $this->loadSharedPosts(); // Load shared posts when a user is selected
+        $this->loadSharedPosts();
     }
+}
+
 
     public function loadMessages()
     {
