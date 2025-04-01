@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\Listing;
 
 use Illuminate\Http\Request;
 
@@ -7,6 +8,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        return view('home'); // This will return the home page view
+        $listings = Listing::latest()->take(6)->get(); // Show latest 6 listings
+        return view('home', compact('listings'));
     }
+    
 }

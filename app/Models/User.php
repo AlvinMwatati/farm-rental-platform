@@ -65,4 +65,25 @@ public function isAdmin()
  // Change this if you use roles/permissions
     }
 
+    public function listings()
+{
+    return $this->hasMany(\App\Models\Listing::class);
+}
+
+    public function posts()
+{
+    return $this->hasMany(Post::class);}
+
+    public function messages()
+{
+    return $this->hasMany(\App\Models\Message::class, 'sender_id');
+}
+
+    public function receivedMessages()
+{
+    return $this->hasMany(\App\Models\Message::class, 'receiver_id');}
+    
+
+    
+
 }
