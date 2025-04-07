@@ -69,6 +69,10 @@ Route::middleware(['auth'])->group(function () {
     })->name('users.list');
 });
 
+Route::get('/my-listings', [ListingController::class, 'myListings'])->name('listings.my');
+Route::get('/listings/{listing}/edit', [ListingController::class, 'edit'])->name('listings.edit');
+Route::delete('/listings/{listing}', [ListingController::class, 'destroy'])->name('listings.destroy');
+
 // ✅ Filament Admin Panel Access
 Route::middleware(['auth', 'can:access-filament'])->group(function () {
     Route::get('/admin/dashboard', function () {

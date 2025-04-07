@@ -55,7 +55,7 @@
                             <div class="p-4">
                                 <h3 class="text-lg font-semibold">{{ $listing->name }}</h3>
                                 <p class="text-gray-600">Location: {{ $listing->location }}</p>
-                                <p class="text-lg font-bold mt-2">${{ $listing->price }}</p>
+                                <p class="text-lg font-bold mt-2">Ksh {{ $listing->price }} per day</p>
                                 <a href="{{ route('chat.start', ['user' => $listing->user_id]) }}" class="block bg-blue-500 text-white text-center py-2 rounded mt-3 hover:bg-blue-600 transition">
                                     Contact Owner
                                 </a>

@@ -24,7 +24,7 @@
                     <h2 class="text-xl font-semibold text-gray-800">{{ $listing->name }}</h2>
                     <p class="text-sm text-gray-600 mt-1">Condition: {{ $listing->condition }}</p>
                     <p class="text-sm text-gray-600 mt-1">Location: {{ $listing->location }}</p>
-                    <p class="text-lg text-gray-800 font-bold mt-2">${{ $listing->price }}</p>
+                    <p class="text-lg text-gray-800 font-bold mt-2">Ksh {{ $listing->price }} per day</p>
                     <div class="mt-4">
                         <a href="{{ route('chat.start', ['user' => $listing->user_id]) }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all">
     Contact Owner
